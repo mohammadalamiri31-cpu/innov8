@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Innov8">
+    <meta name="theme-color" content="#6366f1">
+    <title>Innov8 - Smart Banking for UAE Teens</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --bg: #000000;
+            --bg-card: #0f0f0f;
+            --bg-card2: #1a1a1a;
+            --border: rgba(255,255,255,0.08);
+            --text: #ffffff;
+            --text-dim: rgba(255,255,255,0.6);
+            --text-muted: rgba(255,255,255,0.35);
+            --success: #10b981;
+            --danger: #ef4444;
+        }
+
+        /* Bank Themes */
+        body.bank-enbd { --primary: #e30613; --primary-dark: #b60410; }
+        body.bank-adcb { --primary: #00aeef; --primary-dark: #0090c8; }
+        body.bank-dib { --primary: #d71920; --primary-dark: #b01318; }
+        body.bank-fab { --primary: #005eb8; --primary-dark: #004a93; }
+        body.bank-cbd { --primary: #00914f; --primary-dark: #007540; }
+        body.bank-mashreq { --primary: #e41e26; --primary-dark: #c41a21; }
+        body.bank-rakbank { --primary: #ed1c24; --primary-dark: #c71921; }
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            overflow: hidden;
+            background: var(--bg);
+            font-family: 'Inter', -apple-system, sans-serif;
+            color: var(--text);
+        }
+
+        #app {
+            position: fixed;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .screen {
+            position: absolute;
+            inset: 0;
+            display: none;
+            flex-direction: column;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .screen.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* Header */
+        .header {
+            padding: max(env(safe-area-inset-top), 24px) 24px 20px;
+            background: linear-gradient(180deg, var(--bg) 60%, transparent);
+            flex-shrink: 0;
+        }
+
+        .h-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .logo-icon {
+            width: 48px;
+            height: 48px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 22px;
+            font-weight: 900;
+            color: white;
+            box-shadow: 0 8px 24px rgba(99,102,241,0.3);
+        }
+
+        .logo-text {
+            font-family: 'Outfit', sans-serif;
+            font-size: 24px;
+            font-weight: 900;
+            letter-spacing: -1px;
+        }
+
+        .logo-sub {
+            font-size: 10px;
+            color: var(--text-dim);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bank-badge {
+            padding: 6px 14px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            border: 1px solid var(--border);
+            color: var(--primary);
+        }
+
+        .h-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 32px;
+            font-weight: 900;
+            letter-spacing: -1.5px;
+            margin-bottom: 6px;
+        }
+
+        .h-sub {
+            font-size: 15px;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .back-btn {
+            width: 40px;
+            height: 40px;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
+            cursor: pointer;
+        }
+
+        .back-btn:active {
+            background: var(--bg-card2);
+        }
+
+        /* Content */
+        .content {
+            flex: 1;
+            padding: 0 20px 100px;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Welcome */
+        .welcome-wrap {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 60px 28px max(env(safe-area-inset-bottom), 40px);
+            min-height: 100vh;
+        }
+
+        .welcome-logo {
+            width: 110px;
+            height: 110px;
+            background: linear-gradient(135deg, #6366f1, #8b5cf6);
+            border-radius: 28px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-size: 52px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 32px;
+            box-shadow: 0 24px 64px rgba(99,102,241,0.4);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-12px); }
+        }
+
+        .welcome-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 40px;
+            font-weight: 900;
+            line-height: 1.1;
+            margin-bottom: 16px;
+            letter-spacing: -2px;
+        }
+
+        .welcome-text {
+            font-size: 17px;
+            color: var(--text-dim);
+            line-height: 1.6;
+            margin-bottom: 48px;
+            max-width: 340px;
+            font-weight: 500;
+        }
+
+        /* Buttons */
+        .btn {
+            width: 100%;
+            padding: 18px 24px;
+            border: none;
+            border-radius: 16px;
+            font-size: 17px;
+            font-weight: 800;
+            cursor: pointer;
+            font-family: inherit;
+            transition: all 0.2s;
+            letter-spacing: -0.3px;
+        }
+
+        .btn:active { transform: scale(0.98); }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            box-shadow: 0 4px 20px rgba(99,102,241,0.3);
+        }
+
+        .btn-outline {
+            background: transparent;
+            color: var(--text);
+            border: 2px solid var(--border);
+            margin-top: 12px;
+        }
+
+        .btn-outline:active { background: var(--bg-card); }
+
+        /* Bank Selection */
+        .bank-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px;
+            margin-bottom: 24px;
+        }
+
+        .bank-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 20px;
+            padding: 24px 20px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .bank-card:active { transform: scale(0.96); }
+
+        .bank-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, var(--bg-card), var(--bg-card2));
+            box-shadow: 0 0 0 1px var(--primary);
+        }
+
+        .bank-logo-container {
+            width: 56px;
+            height: 56px;
+            background: white;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .bank-name {
+            font-size: 16px;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 4px;
+        }
+
+        .bank-subtitle {
+            font-size: 12px;
+            color: var(--text-muted);
+            text-align: center;
+            font-weight: 600;
+        }
+
+        /* Balance Card */
+        .bal-card {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border-radius: 24px;
+            padding: 28px 24px;
+            margin: 0 0 28px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 12px 40px rgba(99,102,241,0.25);
+        }
+
+        .bal-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 280px;
+            height: 280px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+
+        .bal-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bal-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: rgba(255,255,255,0.7);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .bal-amt {
+            font-family: 'Outfit', sans-serif;
+            font-size: 44px;
+            font-weight: 900;
+            color: white;
+            margin-bottom: 16px;
+            position: relative;
+            z-index: 1;
+            letter-spacing: -2px;
+        }
+
+        .bal-bottom {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            z-index: 1;
+        }
+
+        .bal-acc {
+            font-family: 'SF Mono', monospace;
+            color: rgba(255,255,255,0.6);
+            font-size: 13px;
+            font-weight: 700;
+        }
+
+        .bal-change {
+            color: white;
+            font-weight: 800;
+            font-size: 14px;
+        }
+
+        /* Actions */
+        .actions {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 12px;
+            margin-bottom: 32px;
+        }
+
+        .action {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px 10px 16px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .action:active {
+            transform: scale(0.95);
+            background: var(--bg-card2);
+        }
+
+        .action-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .action-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-dim);
+        }
+
+        /* Section */
+        .sec-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+        }
+
+        .sec-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 20px;
+            font-weight: 900;
+            letter-spacing: -0.8px;
+        }
+
+        .sec-link {
+            font-size: 14px;
+            color: var(--primary);
+            font-weight: 800;
+            cursor: pointer;
+        }
+
+        /* Transaction */
+        .tx {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .tx:active {
+            transform: scale(0.98);
+            background: var(--bg-card2);
+        }
+
+        .tx-icon {
+            width: 52px;
+            height: 52px;
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .tx-icon.inc { background: rgba(16,185,129,0.15); }
+        .tx-icon.exp { background: rgba(239,68,68,0.15); }
+
+        .tx-info { flex: 1; min-width: 0; }
+
+        .tx-name {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 4px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .tx-meta {
+            font-size: 13px;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .tx-amt {
+            font-family: 'Outfit', sans-serif;
+            font-size: 17px;
+            font-weight: 900;
+            flex-shrink: 0;
+            letter-spacing: -0.8px;
+        }
+
+        .tx-amt.inc { color: var(--success); }
+        .tx-amt.exp { color: var(--danger); }
+
+        /* Nav */
+        .nav {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+            padding: 12px 8px max(env(safe-area-inset-bottom), 12px);
+            display: flex;
+            justify-content: space-around;
+            z-index: 100;
+        }
+
+        .nav-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            cursor: pointer;
+            padding: 8px;
+            border-radius: 14px;
+        }
+
+        .nav-item:active { background: var(--bg-card); }
+
+        .nav-icon {
+            font-size: 24px;
+            filter: grayscale(1) opacity(0.4);
+            transition: filter 0.2s;
+        }
+
+        .nav-item.on .nav-icon { filter: none; }
+
+        .nav-lbl {
+            font-size: 11px;
+            font-weight: 800;
+            color: var(--text-muted);
+            transition: color 0.2s;
+        }
+
+        .nav-item.on .nav-lbl { color: var(--primary); }
+
+        /* Stats */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 14px;
+            margin-bottom: 32px;
+        }
+
+        .stat {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 20px;
+        }
+
+        .stat-val {
+            font-family: 'Outfit', sans-serif;
+            font-size: 28px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            letter-spacing: -1.2px;
+        }
+
+        .stat-lbl {
+            font-size: 12px;
+            color: var(--text-dim);
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Stock */
+        .stock {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 18px;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+
+        .stock:active {
+            transform: scale(0.98);
+            background: var(--bg-card2);
+        }
+
+        .stock-sym {
+            width: 56px;
+            height: 56px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-family: 'Outfit', sans-serif;
+            font-weight: 900;
+            font-size: 14px;
+            color: white;
+            flex-shrink: 0;
+        }
+
+        .stock-info { flex: 1; min-width: 0; }
+
+        .stock-name {
+            font-size: 15px;
+            font-weight: 800;
+            margin-bottom: 4px;
+        }
+
+        .stock-sec {
+            font-size: 13px;
+            color: var(--text-dim);
+            font-weight: 600;
+        }
+
+        .stock-right { text-align: right; flex-shrink: 0; }
+
+        .stock-price {
+            font-family: 'Outfit', sans-serif;
+            font-size: 17px;
+            font-weight: 900;
+            margin-bottom: 4px;
+            letter-spacing: -0.8px;
+        }
+
+        .stock-chg {
+            font-size: 13px;
+            font-weight: 800;
+        }
+
+        .up { color: var(--success); }
+        .down { color: var(--danger); }
+
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.9);
+            backdrop-filter: blur(8px);
+            z-index: 200;
+            align-items: flex-end;
+        }
+
+        .modal.show { display: flex; }
+
+        .modal-cont {
+            width: 100%;
+            background: var(--bg);
+            border-radius: 32px 32px 0 0;
+            padding: 24px 20px max(env(safe-area-inset-bottom), 24px);
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.3s ease;
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+
+        .modal-handle {
+            width: 40px;
+            height: 5px;
+            background: var(--border);
+            border-radius: 3px;
+            margin: 0 auto 24px;
+        }
+
+        .modal-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 26px;
+            font-weight: 900;
+            margin-bottom: 6px;
+            letter-spacing: -1.2px;
+        }
+
+        .modal-sub {
+            font-size: 15px;
+            color: var(--text-dim);
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        /* Form */
+        .field {
+            margin-bottom: 18px;
+        }
+
+        .field-lbl {
+            display: block;
+            font-size: 13px;
+            font-weight: 800;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 10px;
+        }
+
+        .field-input {
+            width: 100%;
+            padding: 16px 18px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            font-size: 17px;
+            color: var(--text);
+            outline: none;
+            font-family: inherit;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .field-input:focus {
+            border-color: var(--primary);
+            background: var(--bg-card2);
+        }
+
+        /* Alert */
+        .alert {
+            display: flex;
+            gap: 12px;
+            padding: 16px 18px;
+            border-radius: 14px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            line-height: 1.5;
+            font-weight: 700;
+        }
+
+        .alert-info {
+            background: rgba(99,102,241,0.12);
+            color: #a5b4fc;
+            border: 1px solid rgba(99,102,241,0.2);
+        }
+
+        .alert-warn {
+            background: rgba(245,158,11,0.12);
+            color: #fcd34d;
+            border: 1px solid rgba(245,158,11,0.2);
+        }
+
+        /* Empty */
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-dim);
+        }
+
+        .empty-icon {
+            font-size: 64px;
+            margin-bottom: 16px;
+            opacity: 0.4;
+        }
+
+        .empty-text {
+            font-size: 15px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        /* Chat */
+        .chat-msgs {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .msg {
+            display: flex;
+            gap: 12px;
+            animation: msgIn 0.3s ease;
+        }
+
+        @keyframes msgIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .msg.user { flex-direction: row-reverse; }
+
+        .msg-av {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: 900;
+            flex-shrink: 0;
+        }
+
+        .msg-av.ai {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+
+        .msg-av.user {
+            background: rgba(255,255,255,0.12);
+            color: white;
+        }
+
+        .msg-bubble {
+            max-width: 75%;
+            padding: 16px 18px;
+            border-radius: 20px;
+            font-size: 15px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .msg.ai .msg-bubble {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            color: var(--text);
+        }
+
+        .msg.user .msg-bubble {
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            font-weight: 700;
+        }
+
+        .chat-input-wrap {
+            padding: 16px 20px calc(env(safe-area-inset-bottom) + 80px);
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(20px);
+            border-top: 1px solid var(--border);
+        }
+
+        .chat-input-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .chat-input {
+            flex: 1;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: 28px;
+            font-size: 16px;
+            color: var(--text);
+            outline: none;
+            font-family: inherit;
+            font-weight: 700;
+            transition: all 0.2s;
+        }
+
+        .chat-input:focus { border-color: var(--primary); }
+
+        .send-btn {
+            width: 52px;
+            height: 52px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            border: none;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            box-shadow: 0 4px 12px rgba(99,102,241,0.3);
+        }
+
+        .send-btn:active { transform: scale(0.92); }
+        .send-btn:disabled { opacity: 0.4; }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: max(env(safe-area-inset-bottom), 100px);
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--bg-card);
+            color: var(--text);
+            padding: 16px 26px;
+            border-radius: 30px;
+            font-size: 15px;
+            font-weight: 800;
+            border: 1px solid var(--border);
+            z-index: 999;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.8);
+            animation: toastIn 0.3s ease;
+        }
+
+        @keyframes toastIn {
+            from { opacity: 0; transform: translate(-50%, 20px); }
+            to { opacity: 1; transform: translate(-50%, 0); }
+        }
+
+        .hidden { display: none !important; }
+        ::-webkit-scrollbar { display: none; }
+
+        /* Success */
+        .success-wrap {
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 80px 28px;
+            min-height: 100vh;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: var(--success);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 52px;
+            margin-bottom: 32px;
+            animation: successPop 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        @keyframes successPop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .success-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 34px;
+            font-weight: 900;
+            margin-bottom: 14px;
+            letter-spacing: -1.5px;
+        }
+
+        .success-text {
+            font-size: 17px;
+            color: var(--text-dim);
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .success-amt {
+            font-family: 'Outfit', sans-serif;
+            font-size: 36px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+            letter-spacing: -1.5px;
+        }
+
+        .success-sub {
+            font-size: 14px;
+            color: var(--text-muted);
+            margin-bottom: 48px;
+            font-weight: 700;
+        }
+    </style>
+</head>
+<body>
+    <div id="app">
+        <!-- Screens dynamically generated -->
+    </div>
+
+    <script>
+        // UAE BANKS DATA
+        const BANKS = {
+            enbd: { id: 'enbd', name: 'Emirates NBD', short: 'ENBD', color: '#e30613' },
+            adcb: { id: 'adcb', name: 'Abu Dhabi Commercial Bank', short: 'ADCB', color: '#00aeef' },
+            dib: { id: 'dib', name: 'Dubai Islamic Bank', short: 'DIB', color: '#d71920' },
+            fab: { id: 'fab', name: 'First Abu Dhabi Bank', short: 'FAB', color: '#005eb8' },
+            cbd: { id: 'cbd', name: 'Commercial Bank of Dubai', short: 'CBD', color: '#00914f' },
+            mashreq: { id: 'mashreq', name: 'Mashreq Bank', short: 'Mashreq', color: '#e41e26' },
+            rakbank: { id: 'rakbank', name: 'The National Bank of Ras Al Khaimah', short: 'RAKbank', color: '#ed1c24' }
+        };
+
+        const STOCKS = [
+            { sym:'EMAAR', name:'Emaar Properties', sec:'Real Estate', price:5.65, ch:2.3 },
+            { sym:'ADNOC', name:'ADNOC Distribution', sec:'Energy', price:4.15, ch:3.1 },
+            { sym:'DFM', name:'Dubai Financial Market', sec:'Financial', price:0.86, ch:1.2 },
+            { sym:'ENBD', name:'Emirates NBD', sec:'Banking', price:15.91, ch:4.2 },
+            { sym:'ARAMEX', name:'Aramex PJSC', sec:'Logistics', price:3.42, ch:-1.5 },
+            { sym:'ETISAL', name:'e& (Etisalat)', sec:'Telecom', price:27.50, ch:1.8 }
+        ];
+
+        let DB = {
+            user: { name:'', email:'', phone:'', acc:'', bank:'' },
+            balance: 0,
+            txs: [],
+            holdings: [],
+            cash: 0,
+            notifs: [],
+            chat: []
+        };
+
+        let currentScreen = 'welcome';
+        let currentModal = null;
+        let balVis = false;
+        let toastTimeout = null;
+
+        const fmt = (n) => `AED ${parseFloat(n||0).toFixed(2)}`;
+        const fmtDate = (d) => {
+            const dt = new Date(d), t = new Date(), y = new Date(t);
+            y.setDate(y.getDate()-1);
+            if (dt.toDateString()===t.toDateString()) return "Today";
+            if (dt.toDateString()===y.toDateString()) return "Yesterday";
+            return dt.toLocaleDateString("en",{day:"numeric",month:"short"});
+        };
+
+        // INITIALIZATION
+        window.addEventListener('DOMContentLoaded', async () => {
+            await load();
+            buildScreens();
+            if (DB.user.name) {
+                setBank(DB.user.bank || 'enbd');
+                showScreen('home');
+                refreshHome();
+            } else {
+                showScreen('welcome');
+            }
+        });
+
+        async function load() {
+            try {
+                const r = localStorage.getItem('innov8-pro');
+                if (r) DB = JSON.parse(r);
+            } catch(e) {}
+        }
+
+        async function save() {
+            try {
+                localStorage.setItem('innov8-pro', JSON.stringify(DB));
+            } catch(e) {}
+        }
+
+        function setBank(bankId) {
+            document.body.className = 'bank-' + bankId;
+        }
+
+        function toast(msg) {
+            if (toastTimeout) clearTimeout(toastTimeout);
+            let t = document.querySelector('.toast');
+            if (!t) {
+                t = document.createElement('div');
+                t.className = 'toast';
+                document.body.appendChild(t);
+            }
+            t.textContent = msg;
+            t.style.display = 'block';
+            toastTimeout = setTimeout(() => t.style.display = 'none', 2500);
+        }
+
+        function showScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            const screen = document.getElementById('s-' + id);
+            if (screen) {
+                screen.classList.add('active');
+                currentScreen = id;
+            }
+        }
+
+        function openModal(id) {
+            closeModal();
+            const m = document.getElementById('m-' + id);
+            if (m) {
+                m.classList.add('show');
+                currentModal = id;
+            }
+        }
+
+        function closeModal() {
+            if (currentModal) {
+                const m = document.getElementById('m-' + currentModal);
+                if (m) m.classList.remove('show');
+                currentModal = null;
+            }
+        }
+
+        // BUILD SCREENS
+        function buildScreens() {
+            const app = document.getElementById('app');
+            app.innerHTML = `
+                ${welcomeScreen()}
+                ${bankSelectScreen()}
+                ${signupScreen()}
+                ${successScreen()}
+                ${homeScreen()}
+                ${txScreen()}
+                ${investScreen()}
+                ${aiScreen()}
+                ${profileScreen()}
+                ${modals()}
+            `;
+        }
+
+        function welcomeScreen() {
+            return `
+                <div class="screen active" id="s-welcome">
+                    <div class="welcome-wrap">
+                        <div class="welcome-logo">i8</div>
+                        <h1 class="welcome-title">Smart Banking<br/>for UAE Teens</h1>
+                        <p class="welcome-text">Build wealth, learn investing, and get AI financial coaching — trusted by UAE's leading banks.</p>
+                        <div style="width:100%; max-width:360px;">
+                            <button class="btn btn-primary" onclick="showScreen('bank-select')">Get Started</button>
+                            <button class="btn btn-outline" onclick="tryLogin()">Sign In</button>
+                        </div>
+                        <div style="margin-top: 40px; text-align: center; max-width: 360px;">
+                            <div style="font-size: 11px; color: var(--text-muted); font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 12px;">Banking Partners</div>
+                            <div style="font-size: 12px; color: var(--text-dim); font-weight: 600; line-height: 1.6;">Emirates NBD • ADCB • DIB • FAB • CBD • Mashreq • RAKbank</div>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function bankSelectScreen() {
+            return `
+                <div class="screen" id="s-bank-select">
+                    <div class="header">
+                        <div class="h-row">
+                            <div class="back-btn" onclick="showScreen('welcome')">←</div>
+                            <div>
+                                <div class="h-title" style="font-size:28px;">Choose Your Bank</div>
+                                <div class="h-sub">Select your family's banking partner</div>
+                            </div>
+                            <div style="width:40px;"></div>
+                        </div>
+                    </div>
+                    <div class="content" style="padding-bottom:40px;">
+                        <div class="alert alert-info">
+                            <span style="font-size:20px;">✨</span>
+                            <span>Innov8 works with all major UAE banks. Your account links to your parent's existing bank.</span>
+                        </div>
+                        <div class="bank-grid">
+                            ${Object.values(BANKS).map(b => `
+                                <div class="bank-card" onclick="selectBank('${b.id}')">
+                                    <div class="bank-logo-container">
+                                        <div style="font-size:20px; font-weight:900; color:${b.color}; font-family:'Outfit',sans-serif;">${b.short}</div>
+                                    </div>
+                                    <div class="bank-name">${b.short}</div>
+                                    <div class="bank-subtitle">${b.name}</div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function selectBank(bankId) {
+            setBank(bankId);
+            DB.user.bank = bankId;
+            save();
+            showScreen('signup');
+        }
+
+        function tryLogin() {
+            if (DB.user.name) {
+                setBank(DB.user.bank || 'enbd');
+                refreshHome();
+                showScreen('home');
+            } else {
+                toast('❌ No account found — please create one');
+            }
+        }
+
+        function signupScreen() {
+            return `
+                <div class="screen" id="s-signup">
+                    <div class="header">
+                        <div class="h-row">
+                            <div class="back-btn" onclick="showScreen('bank-select')">←</div>
+                            <div>
+                                <div class="h-title" style="font-size:24px;">Create Account</div>
+                                <div class="h-sub">Start your financial journey</div>
+                            </div>
+                            <div style="width:40px;"></div>
+                        </div>
+                    </div>
+                    <div class="content" style="padding-bottom:40px;">
+                        <div class="alert alert-info">
+                            <span>🔒</span>
+                            <span>Bank-grade security • Parent-controlled • Fully encrypted</span>
+                        </div>
+                        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:22px; margin-bottom:20px;">
+                            <div class="field">
+                                <label class="field-lbl">Full Name</label>
+                                <input class="field-input" id="f-name" placeholder="Your full name">
+                            </div>
+                            <div class="field">
+                                <label class="field-lbl">Email</label>
+                                <input type="email" class="field-input" id="f-email" placeholder="you@email.com">
+                            </div>
+                            <div class="field">
+                                <label class="field-lbl">Phone Number</label>
+                                <input type="tel" class="field-input" id="f-phone" placeholder="+971 50 000 0000">
+                            </div>
+                            <div class="field" style="margin-bottom:0;">
+                                <label class="field-lbl">Opening Deposit (AED)</label>
+                                <input type="number" class="field-input" id="f-deposit" value="5000" min="100" step="100">
+                            </div>
+                        </div>
+                        <button class="btn btn-primary" onclick="createAccount()">Create My Account</button>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function createAccount() {
+            const name = document.getElementById('f-name').value.trim();
+            const email = document.getElementById('f-email').value.trim();
+            const phone = document.getElementById('f-phone').value.trim();
+            const deposit = parseFloat(document.getElementById('f-deposit').value) || 0;
+
+            if (!name || !email || !phone) {
+                toast('❌ Please fill in all fields');
+                return;
+            }
+            if (deposit < 100) {
+                toast('❌ Minimum deposit is AED 100');
+                return;
+            }
+
+            DB.user = {
+                name,
+                email,
+                phone,
+                acc: 'INN-' + Date.now().toString().slice(-8),
+                bank: DB.user.bank || 'enbd'
+            };
+
+            DB.balance = deposit;
+            DB.cash = deposit;
+            DB.txs = [{
+                id: Date.now(),
+                name: 'Opening Deposit',
+                cat: 'Deposit',
+                type: 'income',
+                amt: deposit,
+                date: new Date().toISOString(),
+                icon: '🏦'
+            }];
+            DB.notifs = [{
+                id: Date.now(),
+                msg: `Welcome to Innov8! ${fmt(deposit)} deposited`,
+                date: new Date().toISOString(),
+                read: false
+            }];
+
+            await save();
+            showScreen('success');
+        }
+
+        function successScreen() {
+            return `
+                <div class="screen" id="s-success">
+                    <div class="success-wrap">
+                        <div class="success-icon">✓</div>
+                        <h2 class="success-title">Account Created!</h2>
+                        <p class="success-text" id="success-name">Welcome!</p>
+                        <p class="success-amt" id="success-bal">AED 0.00</p>
+                        <p class="success-sub">Opening Balance</p>
+                        <div style="width:100%; max-width:360px;">
+                            <button class="btn btn-primary" onclick="enterApp()">Enter Innov8 →</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }
+
+        function enterApp() {
+            const bank = BANKS[DB.user.bank] || BANKS.enbd;
+            document.getElementById('success-name').textContent = `Welcome, ${DB.user.name.split(' ')[0]}!`;
+            document.getElementById('success-bal').textContent = fmt(DB.balance);
+            refreshHome();
+            showScreen('home');
+        }
+
+        function homeScreen() {
+            const bank = BANKS[DB.user.bank] || BANKS.enbd;
+            return `
+                <div class="screen" id="s-home">
+                    <div class="header">
+                        <div class="h-row">
+                            <div class="logo">
+                                <div class="logo-icon">i8</div>
+                                <div>
+                                    <div class="logo-text">Innov8</div>
+                                    <div class="logo-sub" id="home-bank">${bank.short}</div>
+                                </div>
+                            </div>
+                            <div style="display:flex; gap:10px;">
+                                <div class="back-btn" onclick="openModal('notif')" style="border-radius:50%;">
+                                    🔔
+                                    <span class="hidden" id="notif-badge" style="position:absolute; top:-4px; right:-4px; min-width:18px; height:18px; background:var(--danger); border-radius:9px; font-size:10px; font-weight:900; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg); padding:0 4px;"></span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="h-title" id="greeting" style="font-size:30px;">Good morning!</div>
+                        <div class="h-sub">Your financial overview</div>
+                    </div>
+                    <div class="content">
+                        <div class="bal-card" onclick="toggleBal()">
+                            <div class="bal-top">
+                                <div class="bal-label">Available Balance</div>
+                                <div class="bank-badge" id="home-badge">${bank.short}</div>
+                            </div>
+                            <div class="bal-amt" id="balance-amt">AED 0.00</div>
+                            <div class="bal-bottom">
+                                <div class="bal-acc" id="balance-acc">•••• 0000</div>
+                                <div class="bal-change" id="balance-change">Tap to reveal</div>
+                            </div>
+                        </div>
+
+                        <div class="actions">
+                            <div class="action" onclick="openModal('send')">
+                                <div class="action-icon">💸</div>
+                                <div class="action-label">Send</div>
+                            </div>
+                            <div class="action" onclick="openModal('deposit')">
+                                <div class="action-icon">💰</div>
+                                <div class="action-label">Add Money</div>
+                            </div>
+                            <div class="action" onclick="showScreen('invest')">
+                                <div class="action-icon">📈</div>
+                                <div class="action-label">Invest</div>
+                            </div>
+                            <div class="action" onclick="showScreen('ai')">
+                                <div class="action-icon">🤖</div>
+                                <div class="action-label">AI Coach</div>
+                            </div>
+                        </div>
+
+                        <div class="sec-header">
+                            <span class="sec-title">Recent Activity</span>
+                            <span class="sec-link" onclick="showScreen('txs')">See All</span>
+                        </div>
+                        <div id="recent-txs"></div>
+                    </div>
+                    ${nav('home')}
+                </div>
+            `;
+        }
+
+        function refreshHome() {
+            const bank = BANKS[DB.user.bank] || BANKS.enbd;
+            const h = new Date().getHours();
+            const name = DB.user.name.split(' ')[0];
+            let g = h<12?'Good morning':h<18?'Good afternoon':'Good evening';
+            
+            const greeting = document.getElementById('greeting');
+            const bankSub = document.getElementById('home-bank');
+            const bankBadge = document.getElementById('home-badge');
+            const balAmt = document.getElementById('balance-amt');
+            const balAcc = document.getElementById('balance-acc');
+            const balChange = document.getElementById('balance-change');
+
+            if (greeting) greeting.textContent = `${g}, ${name}! 👋`;
+            if (bankSub) bankSub.textContent = bank.short;
+            if (bankBadge) bankBadge.textContent = bank.short;
+
+            if (balVis) {
+                if (balAmt) balAmt.textContent = fmt(DB.balance);
+                if (balAcc) balAcc.textContent = DB.user.acc;
+                const initDep = DB.txs.find(t => t.name === 'Opening Deposit')?.amt || DB.balance;
+                const pct = ((DB.balance - initDep) / initDep * 100).toFixed(1);
+                if (balChange) balChange.textContent = `${pct >= 0 ? '+' : ''}${pct}% overall`;
+            } else {
+                if (balAmt) balAmt.textContent = '••••••••';
+                if (balAcc) balAcc.textContent = '•••• ' + (DB.user.acc || '0000').slice(-4);
+                if (balChange) balChange.textContent = 'Tap to reveal';
+            }
+
+            const list = document.getElementById('recent-txs');
+            if (list) {
+                if (DB.txs.length === 0) {
+                    list.innerHTML = '<div class="empty"><div class="empty-icon">💳</div><p class="empty-text">No transactions yet.<br>Make your first move!</p></div>';
+                } else {
+                    list.innerHTML = DB.txs.slice(0, 5).map(txHTML).join('');
+                }
+            }
+
+            const unread = DB.notifs.filter(n => !n.read).length;
+            const badge = document.getElementById('notif-badge');
+            if (badge) {
+                if (unread > 0) {
+                    badge.textContent = unread > 9 ? '9+' : unread;
+                    badge.classList.remove('hidden');
+                } else {
+                    badge.classList.add('hidden');
+                }
+            }
+        }
+
+        function toggleBal() {
+            balVis = !balVis;
+            refreshHome();
+        }
+
+        function txHTML(tx) {
+            return `
+                <div class="tx">
+                    <div class="tx-icon ${tx.type === 'income' ? 'inc' : 'exp'}">${tx.icon || (tx.type === 'income' ? '↓' : '↑')}</div>
+                    <div class="tx-info">
+                        <div class="tx-name">${tx.name}</div>
+                        <div class="tx-meta">${tx.cat} · ${fmtDate(tx.date)}</div>
+                    </div>
+                    <div class="tx-amt ${tx.type === 'income' ? 'inc' : 'exp'}">${tx.amt > 0 ? '+' : ''}${fmt(Math.abs(tx.amt))}</div>
+                </div>
+            `;
+        }
+
+        function txScreen() {
+            return `
+                <div class="screen" id="s-txs">
+                    <div class="header">
+                        <div class="h-row">
+                            <div class="back-btn" onclick="showScreen('home')">←</div>
+                            <div>
+                                <div class="h-title" style="font-size:24px;">All Activity</div>
+                                <div class="h-sub">Complete history</div>
+                            </div>
+                            <div style="width:40px;"></div>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <div id="all-txs"></div>
+                    </div>
+                    ${nav('txs')}
+                </div>
+            `;
+        }
+
+        function refreshTxs() {
+            const list = document.getElementById('all-txs');
+            if (list) {
+                if (DB.txs.length === 0) {
+                    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p class="empty-text">No transactions yet</p></div>';
+                } else {
+                    list.innerHTML = DB.txs.map(txHTML).join('');
+                }
+            }
+        }
+
+        function investScreen() {
+            return `
+                <div class="screen" id="s-invest">
+                    <div class="header">
+                        <div class="h-row">
+                            <div class="back-btn" onclick="showScreen('home')">←</div>
+                            <div>
+                                <div class="h-title" style="font-size:24px;">Investments</div>
+                                <div class="h-sub">Build your wealth</div>
+                            </div>
+                            <div class="back-btn" onclick="openModal('buy')">+</div>
+                        </div>
+                    </div>
+                    <div class="content">
+                        <div class="stats">
+                            <div class="stat">
+                                <div class="stat-val" id="port-val" style="color:var(--primary);">AED 0</div>
+                                <div class="stat-lbl">Portfolio</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-val" id="port-ret">+0%</div>
+                                <div class="stat-lbl">Return</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-val" id="port-cash" style="font-size:22px;">AED 0</div>
+                                <div class="stat-lbl">Cash</div>
+                            </div>
+                            <div class="stat">
+                                <div class="stat-val" id="port-count">0</div>
+                                <div class="stat-lbl">Holdings</div>
+                            </div>
+                        </div>
+
+                        <div class="sec-header">
+                            <span class="sec-title">UAE Market</span>
+                            <span style="padding:6px 14px; background:rgba(16,185,129,0.12); border-radius:20px; font-size:11px; font-weight:900; color:var(--success); text-transform:uppercase; letter-spacing:0.5px;">Live</span>
+                        </div>
+                        <div id="stocks-list"></div>
+                    </div>
+                    ${nav('invest')}
+                </div>
+            `;
+        }
+
+        function refreshInvest() {
+            const portVal = DB.holdings.reduce((s, h) => {
+                const st = STOCKS.find(x => x.sym === h.sym);
+                return s + (st ? st.price * h.qty : 0);
+            }, 0);
+            const totalPort = portVal + DB.cash;
+            const initDep = DB.txs.find(t => t.name === 'Opening Deposit')?.amt || totalPort;
+            const ret = initDep > 0 ? ((totalPort - initDep) / initDep * 100).toFixed(1) : '0.0';
+
+            const elVal = document.getElementById('port-val');
+            const elRet = document.getElementById('port-ret');
+            const elCash = document.getElementById('port-cash');
+            const elCount = document.getElementById('port-count');
+
+            if (elVal) elVal.textContent = fmt(totalPort).replace('AED ', 'AED\n');
+            if (elCash) elCash.textContent = fmt(DB.cash).replace('AED ', 'AED\n');
+            if (elCount) elCount.textContent = DB.holdings.length;
+            if (elRet) {
+                elRet.textContent = `${parseFloat(ret) >= 0 ? '+' : ''}${ret}%`;
+                elRet.style.color = parseFloat(ret) >= 0 ? 'var(--success)' : 'var(--danger)';
+            }
+
+            const list = document.getElementById('stocks-list');
+            if (list) {
+                list.innerHTML = STOCKS.map(s => `
+                    <div class="stock" onclick="quickBuy('${s.sym}')">
+                        <div class="stock-sym">${s.sym}</div>
+                        <div class="stock-info">
+                            <div class="stock-name">${s.name}</div>
+                            <div class="stock-sec">${s.sec}</div>
+                        </div>
+                        <div class="stock-right">
+                            <div class="stock-price">${fmt(s.price)}</div>
+                            <div class="stock-chg ${s.ch >= 0 ? 'up' : 'down'}">${s.ch >= 0 ? '+' : ''}${s.ch.toFixed(1)}%</div>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        function quickBuy(sym) {
+            openModal('buy');
+            setTimeout(() => {
+                const sel = document.getElementById('buy-sym');
+                if (sel) {
+                    sel.value = sym;
+                    updateBuyCost();
+                }
+            }, 100);
+        }
+
+        function aiScreen() {
+            return `
+                <div class="screen" id="s-ai">
+                    <div class="header">
+                        <div class="h-row">
+                            <div class="back-btn" onclick="showScreen('home')">←</div>
+                            <div>
+                                <div class="h-title" style="font-size:24px;">AI Coach</div>
+                                <div class="h-sub">Financial guidance powered by Claude</div>
+                            </div>
+                            <div class="back-btn" onclick="clearChat()">🗑️</div>
+                        </div>
+                    </div>
+                    <div class="chat-msgs" id="chat-messages">
+                        <div class="msg ai">
+                            <div class="msg-av ai">AI</div>
+                            <div class="msg-bubble">Hi! 👋 I'm your AI financial coach. I can help you with saving, investing, budgeting, and building wealth. What would you like to learn?</div>
+                        </div>
+                    </div>
+                    <div class="chat-input-wrap">
+                        <div class="chat-input-row">
+                            <input class="chat-input" id="chat-input" placeholder="Ask about finance..." onkeypress="if(event.key==='Enter')sendChat()">
+                            <button class="send-btn" onclick="sendChat()" id="send-btn">➤</button>
+                        </div>
+                    </div>
+                    ${nav('ai')}
+                </div>
+            `;
+        }
+
+        async function sendChat() {
+            const input = document.getElementById('chat-input');
+            const msg = input.value.trim();
+            if (!msg) return;
+
+            appendMsg('user', msg);
+            input.value = '';
+
+            DB.chat.push({ role: 'user', content: msg });
+
+            const btn = document.getElementById('send-btn');
+            btn.disabled = true;
+            input.disabled = true;
+
+            const holdingsSummary = DB.holdings.length > 0
+                ? DB.holdings.map(h => `${h.qty} ${h.sym}`).join(', ')
+                : 'No holdings yet';
+
+            const recentTx = DB.txs.slice(0, 3)
+                .map(t => `${t.name} (${t.type === 'income' ? '+' : '-'}${fmt(Math.abs(t.amt))})`).join(', ') || 'None';
+
+            const context = `You are a friendly AI financial coach for teenagers using Innov8 banking app (UAE).
+
+USER DATA:
+- Name: ${DB.user.name}
+- Balance: ${fmt(DB.balance)}
+- Platform: Innov8 (multi-bank platform)
+- Holdings: ${holdingsSummary}
+- Cash: ${fmt(DB.cash)}
+- Recent: ${recentTx}
+
+Keep responses under 120 words, use emojis, reference their real data, give personalized advice for UAE teens.
+
+Question: ${msg}`;
+
+            try {
+                const res = await fetch('https://api.anthropic.com/v1/messages', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        model: 'claude-sonnet-4-20250514',
+                        max_tokens: 400,
+                        messages: [{ role: 'user', content: context }]
+                    })
+                });
+
+                const data = await res.json();
+                const reply = data.content?.[0]?.text || "I'm here to help! Ask me about saving, investing, or budgeting! 💪";
+
+                appendMsg('ai', reply);
+                DB.chat.push({ role: 'assistant', content: reply });
+                await save();
+            } catch (err) {
+                appendMsg('ai', "Connection issue! Tip: saving even AED 100/week = AED 5,200/year. Small habits = big results! 🎯");
+            } finally {
+                btn.disabled = false;
+                input.disabled = false;
+                input.focus();
+            }
+        }
+
+        function appendMsg(role, text) {
+            const box = document.getElementById('chat-messages');
+            if (!box) return;
+            const d = document.createElement('div');
+            d.className = `msg ${role}`;
+            d.innerHTML = `
+                <div class="msg-av ${role}">${role === 'ai' ? 'AI' : DB.user.name.charAt(0)}</div>
+                <div class="msg-bubble">${escapeHTML(text).replace(/\n/g, '<br>')}</div>
+            `;
+            box.appendChild(d);
+            box.scrollTop = box.scrollHeight;
+        }
+
+        async function clearChat() {
+            if (!confirm('Clear chat history?')) return;
+            DB.chat = [];
+            const box = document.getElementById('chat-messages');
+            if (box) {
+                box.innerHTML = `
+                    <div class="msg ai">
+                        <div class="msg-av ai">AI</div>
+                        <div class="msg-bubble">Hi! 👋 I'm your AI financial coach. I can help you with saving, investing, budgeting, and building wealth. What would you like to learn?</div>
+                    </div>
+                `;
+            }
+            await save();
+        }
+
+        function profileScreen() {
+            const bank = BANKS[DB.user.bank] || BANKS.enbd;
+            return `
+                <div class="screen" id="s-profile">
+                    <div class="header">
+                        <div class="h-row">
+                            <div class="back-btn" onclick="showScreen('home')">←</div>
+                            <div>
+                                <div class="h-title" style="font-size:24px;" id="profile-name">Profile</div>
+                                <div class="h-sub" id="profile-email">email@example.com</div>
+                            </div>
+                            <div style="width:40px;"></div>
+                        </div>
+                    </div>
+                    <div class="content" style="padding-bottom:120px;">
+                        <div style="background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:24px; margin-bottom:20px;">
+                            <div style="font-size:13px; font-weight:800; color:var(--text-dim); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:20px;">Account Information</div>
+                            <div style="display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--border);">
+                                <span style="font-size:15px; color:var(--text-dim); font-weight:700;">Bank</span>
+                                <span style="font-size:15px; font-weight:900; color:var(--primary);">${bank.short}</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--border);">
+                                <span style="font-size:15px; color:var(--text-dim); font-weight:700;">Account</span>
+                                <span style="font-size:14px; font-family:monospace; color:var(--text-dim); font-weight:800;" id="profile-acc">•••• 0000</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; padding:14px 0; border-bottom:1px solid var(--border);">
+                                <span style="font-size:15px; color:var(--text-dim); font-weight:700;">Phone</span>
+                                <span style="font-size:15px; color:var(--text-dim); font-weight:700;" id="profile-phone">—</span>
+                            </div>
+                            <div style="display:flex; justify-content:space-between; padding:14px 0;">
+                                <span style="font-size:15px; color:var(--text-dim); font-weight:700;">Member Since</span>
+                                <span style="font-size:15px; color:var(--text-dim); font-weight:700;" id="profile-since">—</span>
+                            </div>
+                        </div>
+
+                        <button class="btn btn-primary" onclick="showScreen('ai')" style="margin-bottom:12px;">🤖 Open AI Coach</button>
+                        <button class="btn btn-outline" onclick="openModal('deposit')">💰 Add Money</button>
+                        <button class="btn btn-outline" onclick="logout()" style="margin-top:20px; color:var(--danger); border-color:rgba(239,68,68,0.3);">Sign Out</button>
+                    </div>
+                    ${nav('profile')}
+                </div>
+            `;
+        }
+
+        function refreshProfile() {
+            const bank = BANKS[DB.user.bank] || BANKS.enbd;
+            const name = document.getElementById('profile-name');
+            const email = document.getElementById('profile-email');
+            const phone = document.getElementById('profile-phone');
+            const acc = document.getElementById('profile-acc');
+            const since = document.getElementById('profile-since');
+
+            if (name) name.textContent = DB.user.name || 'Your Profile';
+            if (email) email.textContent = DB.user.email || '';
+            if (phone) phone.textContent = DB.user.phone || '—';
+            if (acc) acc.textContent = DB.user.acc || '—';
+            
+            const joinDate = DB.txs.find(t => t.name === 'Opening Deposit')?.date;
+            if (joinDate && since) {
+                const date = new Date(joinDate);
+                since.textContent = date.toLocaleDateString('en', { month: 'long', year: 'numeric' });
+            }
+        }
+
+        async function logout() {
+            if (!confirm('Sign out of Innov8?')) return;
+            DB = {
+                user: { name:'', email:'', phone:'', acc:'', bank:'' },
+                balance: 0,
+                txs: [],
+                holdings: [],
+                cash: 0,
+                notifs: [],
+                chat: []
+            };
+            await save();
+            location.reload();
+        }
+
+        function nav(active) {
+            const items = [
+                ['home', '🏠', 'Home'],
+                ['txs', '📋', 'Activity'],
+                ['invest', '📊', 'Invest'],
+                ['ai', '🤖', 'AI Coach'],
+                ['profile', '👤', 'Profile']
+            ];
+            return `
+                <div class="nav">
+                    ${items.map(([id, icon, label]) => `
+                        <div class="nav-item ${active === id ? 'on' : ''}" onclick="showScreen('${id}'); ${active !== id ? `refresh${id.charAt(0).toUpperCase() + id.slice(1)}()` : ''}">
+                            <div class="nav-icon">${icon}</div>
+                            <div class="nav-lbl">${label}</div>
+                        </div>
+                    `).join('')}
+                </div>
+            `;
+        }
+
+        function modals() {
+            return `
+                <div class="modal" id="m-send" onclick="if(event.target.className.includes('modal'))closeModal()">
+                    <div class="modal-cont">
+                        <div class="modal-handle"></div>
+                        <div class="modal-title">Send Money</div>
+                        <div class="modal-sub">Transfer instantly</div>
+                        <div class="alert alert-warn"><span>⚠️</span><span>Transfers over AED 100 require parental approval</span></div>
+                        <div class="field"><label class="field-lbl">Recipient</label><input class="field-input" id="send-to" placeholder="Name or phone"></div>
+                        <div class="field"><label class="field-lbl">Amount (AED)</label><input type="number" class="field-input" id="send-amt" placeholder="0.00" min="1"></div>
+                        <div class="field"><label class="field-lbl">Note (Optional)</label><input class="field-input" id="send-note" placeholder="What's this for?"></div>
+                        <button class="btn btn-primary" onclick="doSend()">Send Money</button>
+                        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="modal" id="m-deposit" onclick="if(event.target.className.includes('modal'))closeModal()">
+                    <div class="modal-cont">
+                        <div class="modal-handle"></div>
+                        <div class="modal-title">Add Money</div>
+                        <div class="modal-sub">Top up your account</div>
+                        <div class="field"><label class="field-lbl">Amount (AED)</label><input type="number" class="field-input" id="dep-amt" placeholder="0.00" min="1"></div>
+                        <div class="field"><label class="field-lbl">Source</label>
+                            <select class="field-input" id="dep-src" style="appearance:none;">
+                                <option>Weekly Allowance</option>
+                                <option>Part-time Job</option>
+                                <option>Gift</option>
+                                <option>Other Income</option>
+                            </select>
+                        </div>
+                        <button class="btn btn-primary" onclick="doDeposit()">Add Money</button>
+                        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="modal" id="m-buy" onclick="if(event.target.className.includes('modal'))closeModal()">
+                    <div class="modal-cont">
+                        <div class="modal-handle"></div>
+                        <div class="modal-title">Buy Stock</div>
+                        <div class="modal-sub">Invest in UAE companies</div>
+                        <div class="alert alert-info"><span>💰</span><span>Cash available: <strong id="buy-cash">${fmt(0)}</strong></span></div>
+                        <div class="field"><label class="field-lbl">Choose Stock</label>
+                            <select class="field-input" id="buy-sym" onchange="updateBuyCost()" style="appearance:none;">
+                                <option value="">Select a stock...</option>
+                                ${STOCKS.map(s => `<option value="${s.sym}">${s.sym} – ${s.name} (${fmt(s.price)})</option>`).join('')}
+                            </select>
+                        </div>
+                        <div class="field"><label class="field-lbl">Number of Shares</label><input type="number" class="field-input" id="buy-qty" placeholder="1" min="1" onkeyup="updateBuyCost()"></div>
+                        <div class="field"><label class="field-lbl">Total Cost</label><input class="field-input" id="buy-cost" readonly placeholder="AED 0.00" style="background:var(--bg-card2);"></div>
+                        <button class="btn btn-primary" id="buy-btn" onclick="doBuy()">Buy Stock</button>
+                        <button class="btn btn-outline" onclick="closeModal()">Cancel</button>
+                    </div>
+                </div>
+
+                <div class="modal" id="m-notif" onclick="if(event.target.className.includes('modal'))closeModal()">
+                    <div class="modal-cont">
+                        <div class="modal-handle"></div>
+                        <div class="modal-title">Notifications</div>
+                        <div class="modal-sub">Recent alerts</div>
+                        <div id="notif-list"></div>
+                    </div>
+                </div>
+            `;
+        }
+
+        async function doSend() {
+            const to = document.getElementById('send-to').value.trim();
+            const amt = parseFloat(document.getElementById('send-amt').value) || 0;
+            const note = document.getElementById('send-note').value.trim();
+
+            if (!to || !amt) {
+                toast('❌ Fill all fields');
+                return;
+            }
+            if (amt > DB.balance) {
+                toast('❌ Insufficient balance');
+                return;
+            }
+
+            DB.balance -= amt;
+            DB.txs.unshift({
+                id: Date.now(),
+                name: `Sent to ${to}`,
+                cat: note || 'Transfer',
+                type: 'expense',
+                amt: -amt,
+                date: new Date().toISOString(),
+                icon: '💸'
+            });
+            DB.notifs.unshift({
+                id: Date.now(),
+                msg: `Sent ${fmt(amt)} to ${to}`,
+                date: new Date().toISOString(),
+                read: false
+            });
+
+            await save();
+            closeModal();
+            refreshHome();
+
+            document.getElementById('send-to').value = '';
+            document.getElementById('send-amt').value = '';
+            document.getElementById('send-note').value = '';
+
+            toast(`✅ Sent ${fmt(amt)} to ${to}!`);
+        }
+
+        async function doDeposit() {
+            const amt = parseFloat(document.getElementById('dep-amt').value) || 0;
+            const src = document.getElementById('dep-src').value;
+
+            if (!amt) {
+                toast('❌ Enter amount');
+                return;
+            }
+
+            DB.balance += amt;
+            DB.cash += amt;
+            DB.txs.unshift({
+                id: Date.now(),
+                name: src,
+                cat: 'Deposit',
+                type: 'income',
+                amt: amt,
+                date: new Date().toISOString(),
+                icon: '💰'
+            });
+            DB.notifs.unshift({
+                id: Date.now(),
+                msg: `Deposited ${fmt(amt)}`,
+                date: new Date().toISOString(),
+                read: false
+            });
+
+            await save();
+            closeModal();
+            refreshHome();
+            refreshInvest();
+
+            document.getElementById('dep-amt').value = '';
+
+            toast(`✅ Added ${fmt(amt)}!`);
+        }
+
+        function updateBuyCost() {
+            const sym = document.getElementById('buy-sym').value;
+            const qty = parseInt(document.getElementById('buy-qty').value) || 0;
+            const stock = STOCKS.find(s => s.sym === sym);
+            const cashEl = document.getElementById('buy-cash');
+
+            if (cashEl) cashEl.textContent = fmt(DB.cash);
+
+            if (stock && qty > 0) {
+                const cost = stock.price * qty;
+                document.getElementById('buy-cost').value = fmt(cost);
+
+                const btn = document.getElementById('buy-btn');
+                if (cost > DB.cash) {
+                    btn.textContent = '❌ Insufficient Funds';
+                    btn.disabled = true;
+                    btn.style.opacity = '0.5';
+                } else {
+                    btn.textContent = `Buy ${qty} ${sym}`;
+                    btn.disabled = false;
+                    btn.style.opacity = '1';
+                }
+            } else {
+                document.getElementById('buy-cost').value = '';
+            }
+        }
+
+        async function doBuy() {
+            const sym = document.getElementById('buy-sym').value;
+            const qty = parseInt(document.getElementById('buy-qty').value) || 0;
+            const stock = STOCKS.find(s => s.sym === sym);
+
+            if (!sym || !qty) {
+                toast('❌ Select stock & quantity');
+                return;
+            }
+
+            const cost = stock.price * qty;
+
+            if (cost > DB.cash) {
+                toast('❌ Insufficient funds');
+                return;
+            }
+
+            DB.cash -= cost;
+            DB.balance -= cost;
+
+            const existing = DB.holdings.find(h => h.sym === sym);
+            if (existing) {
+                const totalShares = existing.qty + qty;
+                existing.avg = ((existing.avg * existing.qty) + (stock.price * qty)) / totalShares;
+                existing.qty = totalShares;
+            } else {
+                DB.holdings.push({
+                    sym: sym,
+                    name: stock.name,
+                    qty: qty,
+                    avg: stock.price
+                });
+            }
+
+            DB.txs.unshift({
+                id: Date.now(),
+                name: `Bought ${qty} ${sym}`,
+                cat: 'Investment',
+                type: 'expense',
+                amt: -cost,
+                date: new Date().toISOString(),
+                icon: '📈'
+            });
+            DB.notifs.unshift({
+                id: Date.now(),
+                msg: `Bought ${qty} shares of ${sym}`,
+                date: new Date().toISOString(),
+                read: false
+            });
+
+            await save();
+            closeModal();
+            refreshHome();
+            refreshInvest();
+
+            document.getElementById('buy-sym').value = '';
+            document.getElementById('buy-qty').value = '';
+            document.getElementById('buy-cost').value = '';
+
+            toast(`✅ Bought ${qty} ${sym} for ${fmt(cost)}!`);
+        }
+
+        function escapeHTML(s) {
+            const d = document.createElement('div');
+            d.textContent = s;
+            return d.innerHTML;
+        }
+
+        // Initialize refresh functions for navigation
+        window.refreshHome = refreshHome;
+        window.refreshTxs = function() {
+            const list = document.getElementById('all-txs');
+            if (list) {
+                if (DB.txs.length === 0) {
+                    list.innerHTML = '<div class="empty"><div class="empty-icon">📋</div><p class="empty-text">No transactions yet</p></div>';
+                } else {
+                    list.innerHTML = DB.txs.map(txHTML).join('');
+                }
+            }
+        };
+        window.refreshInvest = refreshInvest;
+        window.refreshAi = function() { /* Already loaded */ };
+        window.refreshProfile = function() {
+            const bank = BANKS[DB.user.bank] || BANKS.enbd;
+            const name = document.getElementById('profile-name');
+            const email = document.getElementById('profile-email');
+            const phone = document.getElementById('profile-phone');
+            const acc = document.getElementById('profile-acc');
+            const since = document.getElementById('profile-since');
+
+            if (name) name.textContent = DB.user.name || 'Your Profile';
+            if (email) email.textContent = DB.user.email || '';
+            if (phone) phone.textContent = DB.user.phone || '—';
+            if (acc) acc.textContent = DB.user.acc || '—';
+            
+            const joinDate = DB.txs.find(t => t.name === 'Opening Deposit')?.date;
+            if (joinDate && since) {
+                const date = new Date(joinDate);
+                since.textContent = date.toLocaleDateString('en', { month: 'long', year: 'numeric' });
+            }
+        };
+    </script>
+</body>
+</html>
